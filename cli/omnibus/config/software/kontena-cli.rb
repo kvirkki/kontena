@@ -1,6 +1,7 @@
 name "kontena-cli"
 license "Apache-2.0"
 license_file "LICENSE.txt"
+skip_transitive_dependency_licensing true # XXX: assumes bundler is installed within build
 default_version File.read('../VERSION').strip
 source path: "./wrappers"
 dependency "ruby"
