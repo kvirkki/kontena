@@ -78,8 +78,6 @@ namespace :release do
   task :package_ubuntu => [
     :setup,
     :setup_ubuntu,
-    :setup_cli_omnibus,
-    :package_ubuntu_cli,
     :package_ubuntu_server,
     :package_ubuntu_agent,
   ]
@@ -138,7 +136,6 @@ namespace :release do
 
   task :push_ubuntu => [
     :package_ubuntu,
-    :push_ubuntu_cli,
     :push_ubuntu_server,
     :push_ubuntu_agent
   ]
