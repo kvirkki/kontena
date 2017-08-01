@@ -1,15 +1,15 @@
 name "kontena-cli"
 license "Apache 2.0"
 default_version File.read('../VERSION').strip
-source path: "./wrappers"
+source path: ".."
 dependency "ruby"
 dependency "rubygems"
 dependency "libxml2"
 dependency "libxslt"
-whitelist_file "./wrappers/sh/kontena"
 build do
+  gem "build --verbose kontena-cli.gemspec"
   gem "install rb-readline -v 0.5.4 --no-ri --no-doc"
   gem "install nokogiri -v 1.6.8 --no-ri --no-doc"
-  gem "install kontena-cli -v #{default_version} --no-ri --no-doc"
-  copy "sh/kontena", "#{install_dir}/bin/kontena"
+  gem "install --local ./kontena-cli-#{default_version}.gem --no-ri --no-doc"
+  copy "omnibus/wrapper-scripts/kontena", "#{install_dir}/bin/kontena"
 end
