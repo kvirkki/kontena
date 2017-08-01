@@ -7,6 +7,11 @@ namespace :release do
     DOCKER_VERSIONS = ['latest', VERSION.to_s.match(/(\d+\.\d+)/)[1]]
   end
 
+  desc 'Build kontena-cli gem'
+  task :build_gem do
+    sh("gem build kontena-cli.gemspec")
+  end
+
   desc 'Build all'
   task :build => [:build_docker] do
   end
@@ -19,6 +24,10 @@ namespace :release do
       sh("docker rmi #{DOCKER_NAME}:#{v} || true")
       sh("docker tag #{DOCKER_NAME}:#{VERSION} #{DOCKER_NAME}:#{v}")
     end
+  end
+
+  task :push_gem do
+    sh("gem push kontena-cli-#{VERSION}.gem")
   end
 
   desc 'Push all'

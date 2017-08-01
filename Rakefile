@@ -65,7 +65,7 @@ namespace :release do
   task :build_cli_gem do
     headline "Starting to build kontena-cli gem ..."
     Dir.chdir('cli') do
-      sh("gem build kontena-cli.gemspec")
+      sh("bundle exec rake release:build_gem")
     end
   end
 
@@ -115,7 +115,7 @@ namespace :release do
   task :push_cli_gem do
     headline "Starting to push kontena-cli gem..."
     Dir.chdir('cli') do
-      sh("gem push kontena-cli-#{VERSION}.gem")
+      sh("bundle exec rake release:push_gem")
     end
   end
 
