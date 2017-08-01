@@ -25,4 +25,4 @@ rake release:push_omnibus_ubuntu
     --repo kontena \
     --tag $TRAVIS_TAG \
     --name "kontena-cli_${TRAVIS_TAG#v}_amd64.deb" \
-    --file cli/omnibus/pkg/kontena-cli_*.deb
+    --file ./omnibus/pkg/kontena-cli_*.deb
