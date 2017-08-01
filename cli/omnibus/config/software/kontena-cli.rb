@@ -1,5 +1,6 @@
 name "kontena-cli"
-license "Apache 2.0"
+license "Apache-2.0"
+license_file "LICENSE.txt"
 default_version File.read('../VERSION').strip
 source path: ".."
 dependency "ruby"
