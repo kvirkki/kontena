@@ -27,26 +27,43 @@ module Kontena::Actors
       end
     end
 
+    def tty_resize(size)
+      return unless @container_exec
+
+      begin
+        @container_exec.resize({
+          'w' => size['width'], 'h' => size['height']
+        })
+      rescue Docker::Error::NotFoundError
+        sleep 0.1
+        retry if @container_exec
+      end
+    end
+
     # @param [String] cmd
     # @param [Boolean] tty
     # @param [Boolean] stdin
     def run(cmd, tty = false, stdin = false)
       info "starting command: #{cmd} (tty: #{tty}, stdin: #{stdin})"
       exit_code = 0
-      opts = {tty: tty}
-      opts[:stdin] = @read_pipe if stdin
+      @container_exec = build_exec(cmd, tty: tty, stdin: stdin)
       defer {
+        start_opts = {
+          tty: tty,
+          stdin: @read_pipe,
+          detach: false
+        }
         if tty
-          _, _, exit_code = @container.exec(cmd, opts) do |chunk|
+          _, _, exit_code = start_exec(start_opts) do |chunk|
             self.handle_stream_chunk('stdout'.freeze, chunk)
           end
-        else 
-          _, _, exit_code = @container.exec(cmd, opts) do |stream, chunk|
+        else
+          _, _, exit_code = start_exec(start_opts) do |stream, chunk|
             self.handle_stream_chunk(stream, chunk)
           end
         end
       }
-    ensure 
+    ensure
       info "command finished: #{cmd} with code #{exit_code}"
       shutdown(exit_code)
     end
@@ -61,6 +78,28 @@ module Kontena::Actors
     def shutdown(exit_code)
       rpc_client.notification('/container_exec/exit', [@uuid, exit_code])
       self.terminate
+    end
+
+    def build_exec(command, stdin: false, tty: false)
+      opts = {
+        'Container' => @container.id,
+        'AttachStdin' => stdin,
+        'AttachStdout' => true,
+        'AttachStderr' => true,
+        'Tty' => tty,
+        'Cmd' => command
+      }
+      opts['Env'] = ['TERM=xterm'] if tty
+
+      # Create Exec Instance
+      Docker::Exec.create(
+        opts,
+        @container.connection
+      )
+    end
+
+    def start_exec(options, &block)
+      @container_exec.start!(options, &block)
     end
   end
 end
