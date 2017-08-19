@@ -27,6 +27,9 @@ module Kontena::Actors
       end
     end
 
+    # @param [Hash] size
+    # @option size [Integer] width
+    # @option size [Integer] height
     def tty_resize(size)
       return unless @container_exec
 
@@ -68,6 +71,36 @@ module Kontena::Actors
       shutdown(exit_code)
     end
 
+    # @param [Array<String>] command
+    # @param [Boolean] stdin
+    # @param [Boolean] tty
+    # @return [Docker::Exec]
+    def build_exec(command, stdin: false, tty: false)
+      opts = {
+        'Container' => @container.id,
+        'AttachStdin' => stdin,
+        'AttachStdout' => true,
+        'AttachStderr' => true,
+        'Tty' => tty,
+        'Cmd' => command
+      }
+      opts['Env'] = ['TERM=xterm'] if tty && stdin
+
+      # Create Exec Instance
+      Docker::Exec.create(
+        opts,
+        @container.connection
+      )
+    end
+
+    # @param [Hash] options
+    # @option options [Boolean] tty
+    # @option options [IO] stdin
+    # @option options [Boolean] detach
+    def start_exec(options, &block)
+      @container_exec.start!(options, &block)
+    end
+
     # @param [String] stream
     # @param [String] chunk
     def handle_stream_chunk(stream, chunk)
@@ -78,28 +111,6 @@ module Kontena::Actors
     def shutdown(exit_code)
       rpc_client.notification('/container_exec/exit', [@uuid, exit_code])
       self.terminate
-    end
-
-    def build_exec(command, stdin: false, tty: false)
-      opts = {
-        'Container' => @container.id,
-        'AttachStdin' => stdin,
-        'AttachStdout' => true,
-        'AttachStderr' => true,
-        'Tty' => tty,
-        'Cmd' => command
-      }
-      opts['Env'] = ['TERM=xterm'] if tty
-
-      # Create Exec Instance
-      Docker::Exec.create(
-        opts,
-        @container.connection
-      )
-    end
-
-    def start_exec(options, &block)
-      @container_exec.start!(options, &block)
     end
   end
 end
