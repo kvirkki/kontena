@@ -51,7 +51,7 @@ module Kontena::Cli::Stacks
         where.option '--values-from', '[FILE]', 'Read variable values from YAML' do |filename|
           if filename
             require_config_file(filename)
-            @values = ::YAML.safe_load(File.read(filename))
+            @values = ::YAML.safe_load(File.read(filename), [], [], true, filename)
           end
           filename
         end

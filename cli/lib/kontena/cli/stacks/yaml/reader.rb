@@ -76,7 +76,8 @@ module Kontena::Cli::Stacks
               substitutions: default_envs,
               warnings: false
             )
-          )
+          ),
+          [], [], true, file
         ) || {}
       rescue Psych::SyntaxError => ex
         raise ex, "Error while parsing #{file} : #{ex.message}"
@@ -95,14 +96,15 @@ module Kontena::Cli::Stacks
               use_opto: true,
               raise_on_unknown: true
             )
-          )
+          ),
+          [], [], true, file
         ) || {}
       rescue Psych::SyntaxError => ex
         raise ex, "Error while parsing #{file} : #{ex.message}"
       end
 
       def raw_yaml
-        @raw_yaml ||= ::YAML.safe_load(raw_content) || {}
+        @raw_yaml ||= ::YAML.safe_load(raw_content, [], [], true, file) || {}
       end
 
       # @return [Opto::Group]
