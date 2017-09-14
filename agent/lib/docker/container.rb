@@ -29,11 +29,6 @@ module Docker
       self.json['State']
     end
 
-    # @return [Hash]
-    def restart_policy
-      self.host_config['RestartPolicy']
-    end
-
     # @return [String] Stack aware name of the containers service
     def service_name_for_lb
       return self.labels['io.kontena.service.name'] if self.default_stack?
@@ -51,11 +46,6 @@ module Docker
       return false if self.labels['io.kontena.service.id'].nil?
 
       self.labels['io.kontena.stack.name'].nil? || self.labels['io.kontena.stack.name'].to_s == 'null'.freeze
-    end
-
-    # @return [Boolean]
-    def autostart?
-      return ['always', 'unless-stopped'].include?(self.host_config.dig('RestartPolicy', 'Name'))
     end
 
     # @return [Boolean]
@@ -84,6 +74,11 @@ module Docker
       self.state['Dead'] && SUSPICIOUS_EXIT_CODES.include?(self.state['ExitCode'].to_i)
     rescue
       false
+    end
+
+    # @return [DateTime]
+    def started_at
+      DateTime.parse(cached_json['State']['StartedAt'])
     end
 
     # @return [Boolean]

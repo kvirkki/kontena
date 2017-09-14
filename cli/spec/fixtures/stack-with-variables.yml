@@ -38,10 +38,13 @@ services:
     extends:
       file: docker-compose_v2.yml
       service: wordpress
-    image: "wordpress:$TAG"
+    image: "wordpress:$tag"
     stateful: true
     environment:
       - WORDPRESS_DB_PASSWORD=${STACK}_secret
+      - STACK=${STACK}
+      - GRID=${GRID}
+      - PLATFORM=${PLATFORM}
     secrets:
       - secret: WP_ADMIN_PASSWORD
         name: WORDPRESS_PASSWORD

@@ -15,12 +15,12 @@ module Kontena::Cli::Helpers
     Kontena::Websocket::Logging.initialize_logger(STDERR, websocket_log_level)
 
     WEBSOCKET_CLIENT_OPTIONS = {
-      connect_timeout: ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 5.0,
-      open_timeout:    ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 5.0,
+      connect_timeout: ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 10.0,
+      open_timeout:    ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 10.0,
       ping_interval:   ENV["EXCON_READ_TIMEOUT"]    ? ENV["EXCON_READ_TIMEOUT"].to_f    : 30.0,
-      ping_timeout:    ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 5.0,
-      close_timeout:   ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 5.0,
-      write_timeout:   ENV["EXCON_WRITE_TIMEOUT"]   ? ENV["EXCON_WRITE_TIMEOUT"].to_f   : 5.0,
+      ping_timeout:    ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 10.0,
+      close_timeout:   ENV["EXCON_CONNECT_TIMEOUT"] ? ENV["EXCON_CONNECT_TIMEOUT"].to_f : 10.0,
+      write_timeout:   ENV["EXCON_WRITE_TIMEOUT"]   ? ENV["EXCON_WRITE_TIMEOUT"].to_f   : 10.0,
     }
 
     # @param ws [Kontena::Websocket::Client]
@@ -59,6 +59,7 @@ module Kontena::Cli::Helpers
     end
 
     # @param ws [Kontena::Websocket::Client]
+    # @raise [RuntimeError] exec error
     # @return [Integer] exit code
     def websocket_exec_read(ws)
       ws.read do |msg|
@@ -66,7 +67,9 @@ module Kontena::Cli::Helpers
 
         logger.debug "websocket exec read: #{msg.inspect}"
 
-        if msg.has_key?('exit')
+        if msg.has_key?('error')
+          raise msg['error']
+        elsif msg.has_key?('exit')
           # breaks the read loop
           return msg['exit'].to_i
         elsif msg.has_key?('stream')
