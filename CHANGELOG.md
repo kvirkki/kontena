@@ -1,5 +1,227 @@
 # Changelog
 
+## [1.4.0.rc1](https://github.com/kontena/kontena/releases/tag/v1.4.0.rc1) (2017-09-14)
+
+### Highlights
+
+TODO
+
+### Breaking changes
+
+* Master/Node Docker versions older than 1.12 are no longer supported (#2589)
+
+    Docker versions from 1.12 (CoreOS stable) to 17.06 (CoreOS alpha) are supported.
+
+* CLI `kontena {container,service,stack} {logs,events}` options have changed (#2046)
+
+    The old Heroku-style `--lines=N --tail` options have been replaced by `--tail=N --follow` matching the syntax most commonly used by other tools.
+
+### Deprecations
+
+* The `kontena certificate get` command has been deprecated (#2736)
+
+    The old `secret`-based `kontena certificate get` workflow has been replaced by the new `certificate`-based workflow. Certificates created using `kontena certificate request` are visible in `kontena certificate list`, and can be referred to from the stack service `certificates: - subject: ...` blocks.
+
+### Known issues
+
+* `kontena service restart` also triggers ServicePodWorker restart timer (#2781)
+* Updating a certificate does not update services using that certificate (#2801)
+* Stack variable envs leak between dependent child stacks (#2798)
+* Dependent stack variables are not interpolated (#2799)
+
+### Fixed issues
+
+* Node evacuate enhancement server #1030
+* Agent Weave unnecessarily calls weaveexec launch-router, and logs error agent bug #1397
+* Set node labels from kontena-agent container labels agent enhancement #1771
+* Missing CLI omnibus package for Ubuntu cli enhancement #1954
+* Race condition on reserve_node_number with concurrent node creates bug server #2071
+* kontena-agent needs a restart to notice new v1 volume plugins agent bug #2237
+* Upgrade to Alpine 3.6 agent cli enhancement server #2374
+* agent: sometimes agent does not remove containers causing deploys to fail agent bug #2415
+* Allow to set node name via environment variable agent enhancement #2465
+* stateful: true service should not get deployed on instances with ephemeral[=yes] label enhancement server #2487
+* Soft affinity for services cli enhancement server (#2490)
+* Agent does not validate KONTENA_URI=wss:// SSL certs agent (#2500)
+* Raise weave connection limit agent enhancement (#2539)
+* Return also unhealthy count in service json enhancement server (#2564)
+* Ubuntu kontena-agent package is not compatible with Docker 17.06 agent (#2588)
+* Move app commands to plugin chore cli enhancement (#2597)
+* (Docs) Default command for s3 image registry fails bug cli (#2606)
+* Add platform as grid alias in stack yml cli enhancement (#2633)
+* Expose platform name as env agent enhancement (#2634)
+* CLI timeout is too low bug cli (#2637)
+* Server Cloud::WebsocketClient does not validate SSL certificates bug server (#2685)
+* 1.3 Agent stuck connecting to master agent bug (#2723)
+* Make fluentd forwarded logs more structured by default agent enhancement (#2735)
+* kontena node/labels update does not notify nodes bug server (#2746)
+
+### Changes
+
+Commits that affect multiple components are listed separately under each affected component.
+
+#### Agent
+
+* Fix Etcd launcher to tolerate docker errors better (#2509)
+* Add configurable stop timeout for services (#2033)
+* Run post_start hooks before wait for port (#2543)
+* Unlimited connections for weave (#2547)
+* Read-only container instances (#2550)
+* Create HostNode with per-node token for websocket auth (#2504)
+* Rewrite agent websocket client (#2560)
+* Ubuntu kontena-agent: Use /usr/bin/dockerd for compatibility with Docker 1.12 - 17.06 (#2589)
+* Configurable agent node ID, labels (#2590)
+* Agent: minimal update of ruby 2.4 dependencies (#2629)
+* agent: fix nil node_labels from Docker.info (#2642)
+* agent: fix websocket client to not deadlock on sync actor calls from on_pong (#2650)
+* Update agent to ruby 2.4 (#2630)
+* Fix agent Docker.info caching (#2676)
+* Agent: Allow overriding KONTENA_NODE_NAME (#2693)
+* Agent: Upgrade docker-api gem to 1.33.6 (#2695)
+* Agent: upgrade vmstat to 2.3.0 (#2696)
+* Always create HostNode with unique name and node_number (#2694)
+* agent: have SIGTTIN handler use Celluloid.dump (#2727)
+* Fix agent websocket disconnected notifications (#2725)
+* agent: have SIGTTIN handler also dump non-celluloid threads (#2742)
+* Fix agent LogWorker start/stop (#2728)
+* Fix agent container exec input RPC hang (#2743)
+* Add metadata to fluent event hash (#2738)
+* agent: report container exec errors (#2745)
+* Fix Agent ServicePodWorker#container_outdated? to fail if service updated_at is in the future (#2304)
+* Don't start weave if it's already running (#2760)
+* Add rbtrace support to server & agent (#2528)
+* Send & store logs in batches (#2750)
+* Implement container restart policies in the agent ServicePodWorker (#2689)
+* Service cpus limit (#2541)
+* Fix agent ServicePodWorker to ignore old container events (#2773)
+* Implement synchronous Observers and lightweight Observables (#2704)
+* Fix agent ServicePodWorker to not block on wait_for_port (#2776)
+
+#### Server
+
+* server mongo: remove hardcoded read mode because it's default (#2476)
+* Fix healtcheck port validation to check port in unix port range (#2496)
+* Fix LE cert authorization mutation to fail gracefully if not yet registered (#2497)
+* server GridServices::Update: spec and fix multiple names for the same secret (#2506)
+* Server: Upgrade to Alpine 3.6, Ruby 2.4 (#2456)
+* Server: Upgrade rack & roda to latest version (#2457)
+* Server: upgrade puma to 3.9.1 (#2458)
+* Unify common grid create/update POST/PUT parameters (#2488)
+* Fix server .ruby-version (#2527)
+* Automatically determine volume driver version from installed plugins (#2526)
+* Fix any versioned kontena/lb:* image to resolve as an LB service, not just latest (#2530)
+* Server: Fix HostNode connected_at field to type: Time (#2529)
+* Fix mongoid last sort (#2534)
+* Add configurable stop timeout for services (#2033)
+* Use latest HostNodeStat entry when serializing host node (#2555)
+* Support basic authentication in auth provider userinfo request (#2260)
+* Ephemeral nodes should not get any stateful services (#2549)
+* Read-only container instances (#2550)
+* Fix usage of node IDs in CLI, server API JSON + docs (#2483)
+*  Fix server grids update notify (#2585)
+* Create HostNode with per-node token for websocket auth (#2504)
+* Fix grid user remove access check (#2579)
+* Add new user_admin role (#2577)
+* Server: dockerignore docs/ to optimize image build (#2613)
+* Ubuntu kontena-agent: Use /usr/bin/dockerd for compatibility with Docker 1.12 - 17.06 (#2589)
+* Configurable agent node ID, labels (#2590)
+* Update server/docs dependencies for ruby 2.4 (#2632)
+* Fix node token clear to use DELETE /v1/nodes/:id/token (#2636)
+* Prefer reading stats/logs from secondary db node (#2646)
+* Update agent to ruby 2.4 (#2630)
+* Add support for soft affinities (#2540)
+* Add platform name a.k.a grid name to container env and labels (#2670)
+* Remove unnecessary and thread unsafe request parsing in token auth (#2684)
+* Node scheduling availability (#2306)
+* Add unhealthy container counts to service API (#2674)
+* Always create HostNode with unique name and node_number (#2694)
+* Make stack logs accept service names as filters (#2713)
+* Server: Replace use of Celluloid::Future for async threads  (#2699)
+* Fix server node update grid notify (#2747)
+* agent: report container exec errors (#2745)
+* Container#status as running if it's running but previously oom_killed (#2751)
+* Return related services in secret json (#2755)
+* Add rbtrace support to server & agent (#2528)
+* Rewrite server cloud websocket client (#2692)
+* Send & store logs in batches (#2750)
+* Don't fetch too many log items in stream loop (#2761)
+* Service cpus limit (#2541)
+* Initial tls-sni support and new api for domain authorizations (#2732)
+* Fix server GridServices::Start/Stop to not use async_thread (#2778)
+* Fix server HostNode::Update/Remove mutations to not use async_thread (#2783)
+* Fix server Grids::Update mutation to not use async_thread (#2784)
+* Fix server MongoPubsub to rescue block errors, and not use async_thread (#2785)
+* Allow stacks to depend on other stacks (#2707)
+* New certificate model, API, service YAML (#2736)
+
+#### CLI
+
+* cli: fix stream_stdin_to_ws to only use STDIN.raw mode if tty exec (#2499)
+* Fix cli node list sorting, specs (#2512)
+* Unify common grid create/update POST/PUT parameters (#2488)
+* cli: change stacks deploy helper to wait on deployment state (#2525)
+* cli: update grid cloud-config to use [Link] Unmanaged=true (#2494)
+* Add configurable stop timeout for services (#2033)
+* Read-only container instances (#2550)
+* Fix usage of node IDs in CLI, server API JSON + docs (#2483)
+* Create HostNode with per-node token for websocket auth (#2504)
+* Fix kontena node rm: NameError: undefined local variable or method `node_id` (#2580)
+* Build deb package with omnibus (#2614)
+* Rewrite CLI container exec websocket client (#2599)
+* Remove development deps from CLI Omnibus Gemfile (#2624)
+* Fix node token clear to use DELETE /v1/nodes/:id/token (#2636)
+* cli: fix Dockerfile gem install needing ruby-dev for websocket-driver (#2640)
+* Fix cli omnibus package name to kontena-cli (#2656)
+* Add support for soft affinities (#2540)
+* Fix unnecessary spinner nesting during master deploy wizard (#2660)
+* Change CLI log --tail/follow options to match Docker (#2046)
+* Raise cli excon timeout defaults (#2671)
+* Fix kontena registry create to use --s3-v4auth by default (#2673)
+* Fix nil resource usage error on node show cmd (#2678)
+* Add PLATFORM as variable for stack parsing (#2677)
+* Fix error message when trying to use nonexistent master (#2668)
+* CLI: Error out from init-cloud when master already cloud-enabled (#2680)
+* Node scheduling availability (#2306)
+* Fix node show specs to include availability attribute (#2687)
+* CLI: Exit with error from node ssh --any if no nodes are online (#2686)
+* Make stack yml interpolation default ENVs extendable for plugin devs (#2667)
+* Refactor plugin manager (#2434)
+* CLI: Use the "press any key" dialog from tty-prompt library (#2666)
+* cli: bump kontena-websocket-client to 0.1.1 (#2698)
+* CLI: Removed the app subcommand, it is now available as a plugin (#2675)
+* Make stack logs accept service names as filters (#2713)
+* agent: report container exec errors (#2745)
+* Add kontena stack deploy --no-wait (#2758)
+* Add LE TOS agreement on register command (#2754)
+* Service cpus limit (#2541)
+* Initial tls-sni support and new api for domain authorizations (#2732)
+* Allow stacks to depend on other stacks (#2707)
+* New certificate model, API, service YAML (#2736)
+
+#### Docs
+
+* Fixing typo in LB docs (#2492)
+* docs (nodes) Fix dockerd labels without a value (#2454)
+* Unify common grid create/update POST/PUT parameters (#2488)
+* Automatically determine volume driver version from installed plugins (#2526)
+* Update What Is Kontena? documentation (#2451)
+* Add configurable stop timeout for services (#2033)
+* Run post_start hooks before wait for port (#2543)
+* Support basic authentication in auth provider userinfo request (#2260)
+* Ephemeral nodes should not get any stateful services (#2549)
+* make local gitbook work without GA & Hubspot tokens (#2586)
+* Create HostNode with per-node token for websocket auth (#2504)
+* Add new user_admin role (#2577)
+* Rewrite agent websocket client (#2560)
+* Ubuntu kontena-agent: Use /usr/bin/dockerd for compatibility with Docker 1.12 - 17.06 (#2589)
+* Configurable agent node ID, labels (#2590)
+* Add support for soft affinities (#2540)
+* Add v4auth to create registry with s3 driver (#2242)
+* Node scheduling availability (#2306)
+* Agent: Allow overriding KONTENA_NODE_NAME (#2693)
+* CLI: Removed the app subcommand, it is now available as a plugin (#2675)
+* Split out docs as a separate repo (#2752)
+
 ## [1.3.1](https://github.com/kontena/kontena/releases/tag/v1.3.1) (2017-06-16)
 
 **Master & Agents:**
