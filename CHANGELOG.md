@@ -8,13 +8,13 @@ TODO
 
 ### Breaking changes
 
-* Master/Node Docker versions older than 1.12 are no longer supported (#2589)
+* Docker versions older than 1.12 are no longer supported on host/master nodes (#2589)
 
     Docker versions from 1.12 (CoreOS stable) to 17.06 (CoreOS alpha) are supported.
 
-* CLI `kontena {container,service,stack} {logs,events}` options have changed (#2046)
+* The CLI `kontena {container,service,stack} {logs,events}` options have changed (#2046)
 
-    The old Heroku-style `--lines=N --tail` options have been replaced by `--tail=N --follow` matching the syntax most commonly used by other tools.
+    The old Heroku-style `--lines=N --tail` options have been replaced by `--tail=N --follow` matching the options used by most other common tools.
 
 ### Deprecations
 
